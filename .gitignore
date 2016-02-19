@@ -3,3 +3,8 @@
 .settings/
 target/
 /native/
+/.dist/
+/.classes/
+/.test/
+/.build/
+build.properties

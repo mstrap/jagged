@@ -1,0 +1,147 @@
+<project name="jagged" default="rebuild" basedir=".">
+
+	<property file="build.properties"/>
+	<property name="classes.production" value=".build/production"/>
+	<property name="classes.test" value=".build/test"/>
+	<property name="test.report" value=".test"/>
+	<property name="output" value=".dist"/>
+	<property name="jagged.jar" value="${output}/jagged.jar"/>
+
+	<condition property="os.windows">
+		<os family="windows"/>
+	</condition>
+
+	<condition property="os.linux">
+		<os family="unix"/>
+	</condition>
+
+	<condition property="os.mac">
+		<os family="mac"/>
+	</condition>
+
+	<target name="jar.compile">
+   		<delete dir="${classes.production}"/>
+   		<mkdir dir="${classes.production}"/>
+
+   		<javac destdir="${classes.production}" debug="on" optimize="off" deprecation="off" source="1.6" target="1.6" includeantruntime="false">
+   			<src path="src/main/java"/>
+   		</javac>
+   	</target>
+
+    <target name="native.compile.windows" if="os.windows">
+		<fail unless="make.java.home" message="'make.java.home' must be configured in build.properties"/>
+		<exec command="make.cmd" failonerror="true">
+			<env key="JAVA_HOME" value="${make.java.home}"/>
+			<env key="ARCH" value="x86"/>
+			<env key="TARGET_PLATFORM" value="${make.targetPlatform}"/>
+			<env key="LIBJAGGED_CMAKE_FLAGS" value="-DUSE_SDL=OFF"/>
+			<env key="LIBJAGGED_TEST_CMAKE_FLAGS" value="-DUSE_SDL=OFF"/>
+		</exec>
+		<delete dir="native/win32/x86"/>
+        <mkdir dir="native/win32/x86"/>
+        <copy file="target/native/libgit2/x86/RelWithDebInfo/git2.dll" todir="native/win32/x86"/>
+        <copy file="target/native/libjagged/x86/RelWithDebInfo/jagged.dll" todir="native/win32/x86"/>
+		<mkdir dir="${output}"/>
+		<copy todir="${output}">
+			<fileset dir="native" includes="**"/>
+		</copy>
+   	</target>
+
+    <target name="native.compile.linux" if="os.linux" unless="os.mac">
+		<fail unless="make.java.home" message="'make.java.home' must be configured in build.properties"/>
+        <delete dir="native/linux/x86_64"/>
+        <mkdir dir="native/linux/x86_64"/>
+		<exec command="make" failonerror="true">
+			<env key="JAVA_HOME" value="${make.java.home}"/>
+		</exec>
+		<copy file="target/native/libgit2/libgit2.so" todir="native/linux/x86_64"/>
+		<copy file="target/native/libjagged/libjagged.so" todir="native/linux/x86_64"/>
+		<mkdir dir="${output}"/>
+		<copy todir="${output}">
+			<fileset dir="native" includes="**"/>
+		</copy>
+   	</target>
+
+    <target name="native.compile.mac" if="os.mac">
+		<fail unless="make.java.home" message="'make.java.home' must be configured in build.properties"/>
+        <delete dir="native/macosx/x86_64"/>
+        <mkdir dir="native/macosx/x86_64"/>
+		<exec command="make" failonerror="true">
+			<env key="JAVA_HOME" value="${make.java.home}"/>
+		</exec>
+        <copy file="target/native/libgit2/libgit2.dylib" todir="native/macosx/x86_64"/>
+        <copy file="target/native/libjagged/libjagged.dylib" todir="native/macosx/x86_64"/>
+		<mkdir dir="${output}"/>
+		<copy todir="${output}">
+			<fileset dir="native" includes="**"/>
+		</copy>
+   	</target>
+
+	<target name="native.compile" depends="native.compile.linux, native.compile.windows, native.compile.mac"/>
+
+	<target name="native.distclean">
+		<delete dir="target"/>
+   	</target>
+
+	<target name="native.rebuild" depends="native.distclean, native.compile">
+   	</target>
+
+	<target name="native.copy-from-mingw">
+		<copy file="target/native/libgit2/x86/Debug/git2.dll" todir="native/win32/x86"/>
+		<copy file="target/native/libjagged/x86/Debug/jagged.dll" todir="native/win32/x86"/>
+	</target>
+
+	<target name="jar.jar" depends="jar.compile">
+		<mkdir dir="${jagged.jar}/.."/>
+		<jar destfile="${jagged.jar}">
+			<fileset dir="${classes.production}"/>
+		</jar>
+   	</target>
+
+	<target name="build" depends="native.compile, jar.jar">
+		<delete dir="${classes.production}"/>
+	</target>
+
+	<target name="distclean">
+		<delete dir="${output}"/>
+	</target>
+
+	<target name="rebuild" depends="distclean, build">
+	</target>
+
+	<target name="tests.build">
+		<delete dir="${classes.test}"/>
+		<mkdir dir="${classes.test}"/>
+
+		<javac destdir="${classes.test}" debug="on" optimize="off" deprecation="off" source="1.6" target="1.6" includeantruntime="false">
+            <classpath>
+                <pathelement location="lib/junit-4.8.2.jar"/>
+                <pathelement path="${classes.production}"/>
+            </classpath>
+            <src path="src/test/java"/>
+		</javac>
+	</target>
+
+	<target name="tests.run">
+        <mkdir dir="${test.report}"/>
+		<junit logfailedtests="yes" haltonfailure="false" failureproperty="test.errors" fork="true" forkmode="once">
+			<classpath>
+				<pathelement location="lib/junit-4.8.2.jar"/>
+				<pathelement path="${classes.production}"/>
+				<pathelement path="${classes.test}"/>
+			</classpath>
+
+			<formatter type="plain" usefile="true"/>
+
+			<batchtest fork="false" todir="${test.report}" skipNonTests="true">
+				<fileset dir="${classes.test}">
+					<include name="**/**Test.class"/>
+					<exclude name="**/GitTest.class"/>
+				</fileset>
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="tests.buildAndRun" depends="distclean, jar.compile, tests.build, tests.run">
+	</target>
+</project>
