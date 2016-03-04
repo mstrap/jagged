@@ -78,8 +78,13 @@ IF (MSVC)
 ELSE ()
 	SET(CMAKE_C_FLAGS "-D_GNU_SOURCE -Wall -Wextra -Wno-missing-field-initializers -Wstrict-aliasing=2 -Wstrict-prototypes ${CMAKE_C_FLAGS}")
 
-	IF (WIN32 AND NOT CYGWIN)
+	IF (WIN32 AND NOT CYGWIN AND NOT MINGW)
 		SET(CMAKE_C_FLAGS_DEBUG "-D_DEBUG")
+	ENDIF ()
+
+	IF (MINGW)
+		SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wl,--add-stdcall-alias")
+		SET(CMAKE_SHARED_LIBRARY_PREFIX "")
 	ENDIF ()
 ENDIF()
 
