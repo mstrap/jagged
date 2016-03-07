@@ -22,7 +22,7 @@ public class VersionTest
         Version libGit2Version = Version.getLibGit2Version();
 
         Assert.assertEquals(0, libGit2Version.getMajor());
-        Assert.assertEquals(23, libGit2Version.getMinor());
+        Assert.assertEquals(24, libGit2Version.getMinor());
         Assert.assertEquals(0, libGit2Version.getRevision());
     }
 }
