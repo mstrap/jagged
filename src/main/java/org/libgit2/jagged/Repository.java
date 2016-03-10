@@ -187,6 +187,11 @@ public class Repository
         return NativeMethods.statusListNew(this, options, populateOids);
     }
 
+    public Index getIndex()
+    {
+        return NativeMethods.repositoryIndex(this);
+    }
+
     /**
      * Disposes the underlying Repository object.
      */

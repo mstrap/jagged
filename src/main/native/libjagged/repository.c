@@ -4,6 +4,7 @@
 #include <jni.h>
 #include <git2.h>
 
+#include "index.h"
 #include "repository.h"
 #include "reference.h"
 #include "util.h"
@@ -144,6 +145,31 @@ Java_org_libgit2_jagged_core_NativeMethods_repositoryIsBare(
 	is_bare = git_repository_is_bare(repo);
 
 	return is_bare ? JNI_TRUE : JNI_FALSE;
+}
+
+JNIEXPORT jobject JNICALL
+Java_org_libgit2_jagged_core_NativeMethods_repositoryIndex(
+	JNIEnv *env,
+	jclass class,
+	jobject repo_java)
+{
+	git_repository *repo;
+	git_index *index;
+	jobject index_java = NULL;
+	int error;
+
+	assert(env);
+	assert(class);
+	assert(repo_java);
+
+	repo = git_java_handle_get(env, repo_java);
+
+	if ((error = git_repository_index(&index, repo)) < 0)
+		git_java_exception_throw_giterr(env, error);
+	else
+		index_java = git_java_index_init(env, index);
+
+	return index_java;
 }
 
 JNIEXPORT void JNICALL

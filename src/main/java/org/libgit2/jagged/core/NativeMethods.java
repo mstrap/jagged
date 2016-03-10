@@ -5,6 +5,7 @@ import java.io.InputStream;
 import org.libgit2.jagged.Blob;
 import org.libgit2.jagged.Commit;
 import org.libgit2.jagged.GitObject;
+import org.libgit2.jagged.Index;
 import org.libgit2.jagged.ObjectId;
 import org.libgit2.jagged.Options;
 import org.libgit2.jagged.Reference;
@@ -138,4 +139,20 @@ public class NativeMethods
     public static native StatusOptions statusOptionsInit();
 
     public static native Status[] statusListNew(Repository repository, StatusOptions options, boolean populateOids);
+
+    public static native Index repositoryIndex(Repository repository);
+
+    /*
+     * Index operations
+     */
+
+    public static native void indexOpen(Index index, String path);
+
+    public static native void indexFree(Index repository);
+
+    public static native void indexAddByPath(Index index, String path);
+
+    public static native void indexRemoveByPath(Index index, String path);
+
+    public static native void indexWrite(Index index);
 }
