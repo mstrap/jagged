@@ -112,3 +112,6 @@ ENDIF()
 ADD_LIBRARY(jagged_test ${SRC_C})
 TARGET_LINK_LIBRARIES(jagged_test jagged git2)
 
+ADD_EXECUTABLE(test-main ${SRC_C})
+TARGET_LINK_LIBRARIES(test-main jagged git2)
+
