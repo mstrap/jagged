@@ -89,6 +89,7 @@
 	<target name="native.copy-from-mingw">
 		<copy file="target/native/libgit2/x86/Debug/git2.dll" todir="native/win32/x86"/>
 		<copy file="target/native/libjagged/x86/Debug/jagged.dll" todir="native/win32/x86"/>
+		<copy file="target/native/libjagged_test/x86/Debug/jagged_test.dll" todir="native/win32/x86"/>
 	</target>
 
 	<target name="jar.jar" depends="jar.compile">
