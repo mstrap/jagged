@@ -2,15 +2,19 @@ package org.libgit2.jagged.core;
 
 import java.io.InputStream;
 
+import org.libgit2.jagged.AnnotatedCommit;
 import org.libgit2.jagged.Blob;
 import org.libgit2.jagged.Commit;
 import org.libgit2.jagged.GitObject;
 import org.libgit2.jagged.Index;
 import org.libgit2.jagged.ObjectId;
 import org.libgit2.jagged.Options;
+import org.libgit2.jagged.Signature;
+import org.libgit2.jagged.rebase.Rebase;
 import org.libgit2.jagged.Reference;
 import org.libgit2.jagged.Reference.DirectReference;
 import org.libgit2.jagged.Repository;
+import org.libgit2.jagged.rebase.RebaseOperation;
 import org.libgit2.jagged.status.Status;
 import org.libgit2.jagged.Tree;
 import org.libgit2.jagged.TreeEntry;
@@ -155,4 +159,22 @@ public class NativeMethods
     public static native void indexRemoveByPath(Index index, String path);
 
     public static native void indexWrite(Index index);
+
+    /*
+     * Rebase operations
+     */
+
+    public static native AnnotatedCommit annotatedCommitFromRef(Repository repo, Reference ref);
+
+    public static native void annotatedCommitFree(AnnotatedCommit commit);
+
+    public static native Rebase rebaseInit(Repository repo, AnnotatedCommit branch, AnnotatedCommit upstream, AnnotatedCommit onto);
+
+    public static native RebaseOperation rebaseNext(Rebase rebase);
+
+    public static native void rebaseFinish(Rebase rebase, Signature signature);
+
+    public static native void rebaseFree(Rebase rebase);
+
+    public static native RebaseOperation rebaseCommit(Rebase rebase, Signature author, Signature committer, String messageEncoding, String message);
 }

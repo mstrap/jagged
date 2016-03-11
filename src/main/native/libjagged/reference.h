@@ -6,6 +6,7 @@
 #include "oid.h"
 #include "util.h"
 
+#define GIT_JAVA_CLASS_REFERENCE "org/libgit2/jagged/Reference"
 #define GIT_JAVA_CLASS_REFERENCE_DIRECT "org/libgit2/jagged/Reference$DirectReference"
 #define GIT_JAVA_CLASS_REFERENCE_SYMBOLIC "org/libgit2/jagged/Reference$SymbolicReference"
 
